@@ -128,42 +128,38 @@ async function loadData(){
 /* Manual Training */
 const letterSelect=document.getElementById('letterSelect');
 const letterGrid=document.getElementById('letterGrid');
-let trainMode='letters'; // 'letters' | 'numbers'
+const numberGrid=document.getElementById('numberGrid');
 let selectedLetter='A';
-
-function currentSymbolSet(){ return trainMode==='numbers' ? NUMBERS : LETTERS; }
 
 function populateLetterSelect(){
   letterSelect.innerHTML='';
-  currentSymbolSet().forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;letterSelect.appendChild(o);});
-  selectedLetter = currentSymbolSet()[0];
+  const letterGroup=document.createElement('optgroup'); letterGroup.label='Letters';
+  LETTERS.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;letterGroup.appendChild(o);});
+  letterSelect.appendChild(letterGroup);
+  const numberGroup=document.createElement('optgroup'); numberGroup.label='Numbers';
+  NUMBERS.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;numberGroup.appendChild(o);});
+  letterSelect.appendChild(numberGroup);
   letterSelect.value = selectedLetter;
 }
 populateLetterSelect();
 
 letterSelect.onchange=()=>{selectedLetter=letterSelect.value;renderLetterGrid();};
 
-function setTrainMode(mode){
-  trainMode = mode;
-  document.getElementById('modeLettersBtn').classList.toggle('sel', mode==='letters');
-  document.getElementById('modeNumbersBtn').classList.toggle('sel', mode==='numbers');
-  populateLetterSelect();
-  renderLetterGrid();
-}
-document.getElementById('modeLettersBtn').onclick=()=>setTrainMode('letters');
-document.getElementById('modeNumbersBtn').onclick=()=>setTrainMode('numbers');
-
-function renderLetterGrid(){
-  letterGrid.innerHTML='';
-  letterGrid.className = 'lettersgrid' + (trainMode==='numbers' ? ' numbersgrid' : '');
-  currentSymbolSet().forEach(l=>{
+function renderSymbolRow(container, symbols){
+  container.innerHTML='';
+  symbols.forEach(l=>{
     const n=dataset[l].length;
     const d=document.createElement('div');
     d.className='lb'+(l===selectedLetter?' selected':'')+(n>0?' has-data':'');
     d.innerHTML=`${l}<span class="cnt">${n}</span>`;
     d.onclick=()=>{selectedLetter=l;letterSelect.value=l;renderLetterGrid();};
-    letterGrid.appendChild(d);
+    container.appendChild(d);
   });
+}
+
+function renderLetterGrid(){
+  renderSymbolRow(letterGrid, LETTERS);
+  renderSymbolRow(numberGrid, NUMBERS);
 }
 renderLetterGrid();
 

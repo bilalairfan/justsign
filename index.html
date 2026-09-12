@@ -96,17 +96,16 @@
         </div>
       </div>
       <div>
-        <div class="row modeswitch">
-          <button class="ctl mode-btn sel" id="modeLettersBtn">Letters</button>
-          <button class="ctl mode-btn" id="modeNumbersBtn">Numbers 0–10</button>
-        </div>
-        <div class="row" style="margin-top:10px;">
+        <div class="row">
           <select id="letterSelect"></select>
           <button class="ctl primary" id="captureBtn" disabled>Capture sample</button>
           <button class="ctl" id="burstBtn" disabled>Burst ×20</button>
         </div>
         <div class="trainstatus" id="captureStatus">Start the training camera, hold a hand sign steady, then capture.</div>
+        <div class="gridlabel">Letters</div>
         <div class="lettersgrid" id="letterGrid"></div>
+        <div class="gridlabel">Numbers 0–10</div>
+        <div class="lettersgrid numbersgrid" id="numberGrid"></div>
         <div class="row" style="margin-top:14px;">
           <button class="ctl danger" id="clearLetterBtn">Clear selected letter</button>
           <button class="ctl danger" id="clearAllBtn">Clear all data</button>

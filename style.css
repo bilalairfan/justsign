@@ -158,12 +158,11 @@
   button.ctl.danger{border-color:var(--red);color:var(--red);background:var(--bg);}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 
-  /* Letters / Numbers mode switch */
-  .modeswitch{gap:8px;}
-  button.ctl.mode-btn{flex:1;font-weight:600;text-align:center;}
-  button.ctl.mode-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(58,58,255,0.08);}
+  .gridlabel{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text2);
+    font-weight:700;margin:14px 0 6px;}
+  .gridlabel:first-of-type{margin-top:12px;}
 
-  .lettersgrid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:12px;}
+  .lettersgrid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:0;}
   .lettersgrid.numbersgrid{grid-template-columns:repeat(6,1fr);}
   .lb{position:relative;padding:8px 0;text-align:center;border-radius:7px;font-size:13px;font-weight:700;
     cursor:pointer;border:1.5px solid var(--border2);background:var(--panel2);font-family:'Space Grotesk',sans-serif;transition:.15s;color:var(--ink);}
