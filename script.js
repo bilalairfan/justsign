@@ -14,7 +14,10 @@ const WORDS = [
   "SUNSHINE","STARLIGHT","MOUNTAIN","BUTTERFLY","ADVENTURE","FANTASTIC","DIAMONDS","CREATIVE"
 ].filter(w=>w.length>=3 && w.length<=8);
 
-let dataset = {}; LETTERS.forEach(l=>dataset[l]=[]);
+const NUMBERS = Array.from({length:11},(_,i)=>String(i)); // "0".."10"
+const SYMBOLS = LETTERS.concat(NUMBERS);
+
+let dataset = {}; SYMBOLS.forEach(l=>dataset[l]=[]);
 
 /* KNN Math Model */
 const FINGER_JOINTS = { thumb:[1,2,3,4], index:[5,6,7,8], middle:[9,10,11,12], ring:[13,14,15,16], pinky:[17,18,19,20] };
@@ -51,7 +54,7 @@ function extractFeatures(lm){
 function euclidean(a,b){let s=0;for(let i=0;i<a.length;i++){const d=a[i]-b[i];s+=d*d;}return Math.sqrt(s);}
 function classify(feat,k=7){
   const all=[];
-  for(const l of LETTERS)for(const f of dataset[l])all.push({l,d:euclidean(feat,f)});
+  for(const l of Object.keys(dataset))for(const f of dataset[l])all.push({l,d:euclidean(feat,f)});
   if(all.length===0)return null;
   all.sort((a,b)=>a.d-b.d);
   const top=all.slice(0,Math.min(k,all.length));
@@ -82,10 +85,10 @@ const DEFAULT_DATASET_FILES = [
   'teammate4.json'
 ];
 
-let bakedDataset = {}; LETTERS.forEach(l=>bakedDataset[l]=[]);   // from /training-data/*.json
-let personalDataset = {}; LETTERS.forEach(l=>personalDataset[l]=[]); // this browser only
+let bakedDataset = {}; SYMBOLS.forEach(l=>bakedDataset[l]=[]);   // from /training-data/*.json
+let personalDataset = {}; SYMBOLS.forEach(l=>personalDataset[l]=[]); // this browser only
 
-function rebuildDataset(){ LETTERS.forEach(l=>{ dataset[l] = bakedDataset[l].concat(personalDataset[l]); }); }
+function rebuildDataset(){ SYMBOLS.forEach(l=>{ dataset[l] = bakedDataset[l].concat(personalDataset[l]); }); }
 
 async function loadDefaultDatasets(){
   let filesLoaded=0;
@@ -94,7 +97,7 @@ async function loadDefaultDatasets(){
       const res = await fetch(path);
       if(!res.ok) continue;
       const parsed = await res.json();
-      LETTERS.forEach(l=>{ if(parsed[l] && parsed[l].length) bakedDataset[l]=bakedDataset[l].concat(parsed[l]); });
+      SYMBOLS.forEach(l=>{ if(parsed[l] && parsed[l].length) bakedDataset[l]=bakedDataset[l].concat(parsed[l]); });
       filesLoaded++;
     }catch(e){ /* file missing or not JSON yet — skip it */ }
   }
@@ -110,12 +113,12 @@ async function loadData(){
     const raw = localStorage.getItem('asl_dataset_v1');
     if(raw){
       const parsed = JSON.parse(raw);
-      LETTERS.forEach(l=>{ if(parsed[l]) personalDataset[l]=parsed[l]; });
+      SYMBOLS.forEach(l=>{ if(parsed[l]) personalDataset[l]=parsed[l]; });
     }
   }catch(e){}
   rebuildDataset();
-  const total = LETTERS.reduce((s,l)=>s+dataset[l].length,0);
-  const personalTotal = LETTERS.reduce((s,l)=>s+personalDataset[l].length,0);
+  const total = SYMBOLS.reduce((s,l)=>s+dataset[l].length,0);
+  const personalTotal = SYMBOLS.reduce((s,l)=>s+personalDataset[l].length,0);
   document.getElementById('loadMsg').textContent = total
     ? `Loaded ${total} samples (${filesLoaded} team file${filesLoaded===1?'':'s'}${personalTotal?` + ${personalTotal} of your own`:''}).`
     : 'No training data yet — capture some samples or add team files to /training-data/.';
@@ -125,13 +128,35 @@ async function loadData(){
 /* Manual Training */
 const letterSelect=document.getElementById('letterSelect');
 const letterGrid=document.getElementById('letterGrid');
+let trainMode='letters'; // 'letters' | 'numbers'
 let selectedLetter='A';
-LETTERS.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;letterSelect.appendChild(o);});
+
+function currentSymbolSet(){ return trainMode==='numbers' ? NUMBERS : LETTERS; }
+
+function populateLetterSelect(){
+  letterSelect.innerHTML='';
+  currentSymbolSet().forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;letterSelect.appendChild(o);});
+  selectedLetter = currentSymbolSet()[0];
+  letterSelect.value = selectedLetter;
+}
+populateLetterSelect();
+
 letterSelect.onchange=()=>{selectedLetter=letterSelect.value;renderLetterGrid();};
+
+function setTrainMode(mode){
+  trainMode = mode;
+  document.getElementById('modeLettersBtn').classList.toggle('sel', mode==='letters');
+  document.getElementById('modeNumbersBtn').classList.toggle('sel', mode==='numbers');
+  populateLetterSelect();
+  renderLetterGrid();
+}
+document.getElementById('modeLettersBtn').onclick=()=>setTrainMode('letters');
+document.getElementById('modeNumbersBtn').onclick=()=>setTrainMode('numbers');
 
 function renderLetterGrid(){
   letterGrid.innerHTML='';
-  LETTERS.forEach(l=>{
+  letterGrid.className = 'lettersgrid' + (trainMode==='numbers' ? ' numbersgrid' : '');
+  currentSymbolSet().forEach(l=>{
     const n=dataset[l].length;
     const d=document.createElement('div');
     d.className='lb'+(l===selectedLetter?' selected':'')+(n>0?' has-data':'');
@@ -189,14 +214,14 @@ document.getElementById('burstBtn').onclick=()=>{
   document.getElementById('captureStatus').textContent='Burst capturing…';
 };
 document.getElementById('clearLetterBtn').onclick=()=>{ personalDataset[selectedLetter]=[]; rebuildDataset(); renderLetterGrid(); saveData(); document.getElementById('captureStatus').textContent=`Cleared your samples for "${selectedLetter}" (team defaults kept).`; };
-document.getElementById('clearAllBtn').onclick=()=>{ if(!confirm('Clear all of YOUR captured samples? (Team defaults will remain.)'))return; LETTERS.forEach(l=>personalDataset[l]=[]); rebuildDataset(); renderLetterGrid(); saveData(); document.getElementById('captureStatus').textContent='Cleared your samples (team defaults kept).'; };
+document.getElementById('clearAllBtn').onclick=()=>{ if(!confirm('Clear all of YOUR captured samples? (Team defaults will remain.)'))return; SYMBOLS.forEach(l=>personalDataset[l]=[]); rebuildDataset(); renderLetterGrid(); saveData(); document.getElementById('captureStatus').textContent='Cleared your samples (team defaults kept).'; };
 document.getElementById('exportBtn').onclick=()=>{
   const blob = new Blob([JSON.stringify(personalDataset)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = 'training-data.json'; a.click();
   URL.revokeObjectURL(url);
-  document.getElementById('captureStatus').textContent = 'Exported — rename the file (e.g. teammate2.json) and add it to /training-data/ in the repo.';
+  document.getElementById('captureStatus').textContent = 'Exported (letters + numbers) — rename the file (e.g. teammate2.json) and add it to /training-data/ in the repo.';
 };
 
 const trainModal=document.getElementById('trainModal');
