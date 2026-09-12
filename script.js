@@ -128,17 +128,12 @@ async function loadData(){
 /* Manual Training */
 const letterSelect=document.getElementById('letterSelect');
 const letterGrid=document.getElementById('letterGrid');
-const numberGrid=document.getElementById('numberGrid');
+const numberButtons=document.getElementById('numberButtons');
 let selectedLetter='A';
 
 function populateLetterSelect(){
   letterSelect.innerHTML='';
-  const letterGroup=document.createElement('optgroup'); letterGroup.label='Letters';
-  LETTERS.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;letterGroup.appendChild(o);});
-  letterSelect.appendChild(letterGroup);
-  const numberGroup=document.createElement('optgroup'); numberGroup.label='Numbers';
-  NUMBERS.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;numberGroup.appendChild(o);});
-  letterSelect.appendChild(numberGroup);
+  LETTERS.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=l;letterSelect.appendChild(o);});
   letterSelect.value = selectedLetter;
 }
 populateLetterSelect();
@@ -152,14 +147,27 @@ function renderSymbolRow(container, symbols){
     const d=document.createElement('div');
     d.className='lb'+(l===selectedLetter?' selected':'')+(n>0?' has-data':'');
     d.innerHTML=`${l}<span class="cnt">${n}</span>`;
-    d.onclick=()=>{selectedLetter=l;letterSelect.value=l;renderLetterGrid();};
+    d.onclick=()=>{selectedLetter=l;letterSelect.value=LETTERS.includes(l)?l:letterSelect.value;renderLetterGrid();};
     container.appendChild(d);
+  });
+}
+
+function renderNumberButtons(){
+  numberButtons.innerHTML='';
+  NUMBERS.forEach(n=>{
+    const count=dataset[n].length;
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='numbtn'+(n===selectedLetter?' selected':'')+(count>0?' has-data':'');
+    btn.innerHTML=`<span class="numbtn-val">${n}</span><span class="numbtn-cnt">${count}</span>`;
+    btn.onclick=()=>{ selectedLetter=n; renderLetterGrid(); };
+    numberButtons.appendChild(btn);
   });
 }
 
 function renderLetterGrid(){
   renderSymbolRow(letterGrid, LETTERS);
-  renderSymbolRow(numberGrid, NUMBERS);
+  renderNumberButtons();
 }
 renderLetterGrid();
 

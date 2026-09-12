@@ -163,7 +163,6 @@
   .gridlabel:first-of-type{margin-top:12px;}
 
   .lettersgrid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:0;}
-  .lettersgrid.numbersgrid{grid-template-columns:repeat(6,1fr);}
   .lb{position:relative;padding:8px 0;text-align:center;border-radius:7px;font-size:13px;font-weight:700;
     cursor:pointer;border:1.5px solid var(--border2);background:var(--panel2);font-family:'Space Grotesk',sans-serif;transition:.15s;color:var(--ink);}
   .lb:hover{border-color:var(--ink);transform:translateY(-1px);}
@@ -171,3 +170,15 @@
   .lb.selected{border-color:var(--accent);background:rgba(58,58,255,0.08);}
   .lb.has-data .cnt{color:var(--green);}
   .trainstatus{font-size:12px;color:var(--text2);margin-top:10px;min-height:16px;}
+
+  /* Dedicated number buttons (0-10) — separate from the letters grid */
+  .numberrow{display:flex;flex-wrap:wrap;gap:6px;}
+  button.numbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    width:52px;height:52px;border-radius:10px;border:1.5px solid var(--border2);background:var(--panel2);
+    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;color:var(--ink);cursor:pointer;
+    transition:.15s;padding:0;}
+  button.numbtn:hover{border-color:var(--ink);transform:translateY(-1px);}
+  button.numbtn .numbtn-val{line-height:1.1;}
+  button.numbtn .numbtn-cnt{font-size:9px;font-weight:400;color:var(--text2);font-family:'Inter',sans-serif;margin-top:1px;}
+  button.numbtn.selected{border-color:var(--accent);background:rgba(58,58,255,0.08);color:var(--accent);}
+  button.numbtn.has-data .numbtn-cnt{color:var(--green);}
